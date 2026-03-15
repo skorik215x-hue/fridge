@@ -1131,11 +1131,14 @@ itemsRef.on('value', (snapshot) => {
 
 function getApiKey() {
   const stored = localStorage.getItem(API_KEY_STORAGE);
-  if (stored) return stored;
+  // Если пользователь вручную задал ключ И он не из нашего пула — используем его
+  if (stored && !API_KEYS.includes(stored)) return stored;
   return API_KEYS[currentKeyIndex];
 }
 function getNextApiKey() {
   currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
+  // Сбрасываем сохранённый ключ чтобы не мешал ротации
+  localStorage.removeItem(API_KEY_STORAGE);
   return API_KEYS[currentKeyIndex];
 }
 function setApiKey(k) { localStorage.setItem(API_KEY_STORAGE, k); updateAiBadge(); }
@@ -1366,6 +1369,7 @@ async function callGemini(parts, _retryCount) {
     return parsed;
   } catch(e) {
     console.warn(`[AI #${callNum}] Ошибка:`, e);
+    showToast(`AI ошибка: ${e.message?.substring(0, 60) || e}`);
     return null;
   }
 }
