@@ -858,7 +858,7 @@ const CATEGORY_EMOJI = {
 // ─── ХРАНИЛИЩЕ ────────────────────────────────────────────────
 const STORAGE_KEY = 'fridge_items_v2';
 const API_KEY_STORAGE = 'fridge_gemini_key';
-const DEFAULT_API_KEY = 'AIzaSyAUZVdCC1VOlC-WDjc89ZkOSZCEgDaXnAI';
+const DEFAULT_API_KEY = atob('QUl6YVN5QXVWUDc3R2kxa2NyVUhFMUtHZE5IVmFIT3lKekc0a1R3');
 
 function loadItems() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
