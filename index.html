@@ -1033,6 +1033,32 @@ ${AI_RULES}
 }
 
 // ─── AI: ВЫЗОВ GEMINI ────────────────────────────────────────
+// Сжатие картинки перед отправкой в AI
+function compressImage(base64data, mimeType) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1280;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        const ratio = Math.min(MAX / w, MAX / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+      console.log(`[IMG] ${img.width}x${img.height} → ${w}x${h}, ${Math.round(base64data.length/1024)}KB → ${Math.round(compressed.length/1024)}KB`);
+      resolve(compressed);
+    };
+    img.onerror = () => resolve(base64data);
+    img.src = `data:${mimeType};base64,${base64data}`;
+  });
+}
+
 let apiCallCount = 0;
 
 async function callGemini(parts) {
@@ -1066,13 +1092,31 @@ async function callGemini(parts) {
     }
     if (!resp.ok) {
       const errData = await resp.json().catch(() => ({}));
+      const errMsg = errData?.error?.message || `HTTP ${resp.status}`;
       console.warn(`[AI #${callNum}] Ошибка ${resp.status}:`, errData);
+      showToast(`Ошибка AI: ${errMsg.substring(0, 80)}`);
       return null;
     }
 
     const data = await resp.json();
     console.log(`[AI #${callNum}] Ответ:`, data);
+
+    // Проверяем blocked/empty ответы
+    if (!data.candidates || data.candidates.length === 0) {
+      console.warn(`[AI #${callNum}] Пустой ответ:`, data);
+      const reason = data.promptFeedback?.blockReason || 'пустой ответ';
+      showToast(`AI не ответил: ${reason}`);
+      return null;
+    }
+
     let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!raw) {
+      const finishReason = data.candidates?.[0]?.finishReason || 'unknown';
+      console.warn(`[AI #${callNum}] Нет текста, finishReason:`, finishReason);
+      showToast(`AI не дал ответ (${finishReason})`);
+      return null;
+    }
+
     raw = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
     const parsed = JSON.parse(raw);
     console.log(`[AI #${callNum}] Распарсено:`, parsed);
@@ -1215,7 +1259,9 @@ async function handlePhoto(event) {
   transcript.className = 'transcript-box visible';
   transcript.textContent = 'AI сканирует скриншот...';
 
-  const aiResult = await parseImageWithAI(base64, file.type || 'image/jpeg');
+  // Сжимаем картинку если слишком большая
+  const compressedBase64 = await compressImage(base64, file.type || 'image/jpeg');
+  const aiResult = await parseImageWithAI(compressedBase64, 'image/jpeg');
 
   photoBtn.classList.remove('processing');
 
