@@ -1913,16 +1913,28 @@ async function loadRecipes() {
 - Можно предположить что дома есть соль, перец, масло, вода
 - Названия весёлые и аппетитные`;
 
+  console.log('[Рецепты] Промпт:', productsText);
+  console.log('[Рецепты] items:', items.length, 'fridge:', fridgeItems.length, 'stock:', stockItems.length);
   const result = await callGemini([{ text: prompt }]);
+  console.log('[Рецепты] Результат:', result, 'тип:', typeof result, 'массив:', Array.isArray(result));
 
   btn.classList.remove('loading');
   btn.textContent = 'Обновить';
 
-  if (result && result.length > 0) {
+  if (result && Array.isArray(result) && result.length > 0) {
     recipesCache = result;
     renderRecipes();
+  } else if (result && !Array.isArray(result) && typeof result === 'object') {
+    // Gemini мог вернуть объект с ключом recipes
+    const arr = result.recipes || result.data || Object.values(result)[0];
+    if (Array.isArray(arr) && arr.length > 0) {
+      recipesCache = arr;
+      renderRecipes();
+    } else {
+      container.innerHTML = '<div class="recipes-empty">Формат: ' + JSON.stringify(result).substring(0, 100) + '</div>';
+    }
   } else {
-    container.innerHTML = '<div class="recipes-empty">Не удалось подобрать рецепты</div>';
+    container.innerHTML = '<div class="recipes-empty">Ошибка: result=' + JSON.stringify(result).substring(0, 100) + '</div>';
   }
 }
 
