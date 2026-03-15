@@ -977,7 +977,8 @@ const AI_JSON_FORMAT = `[
     "action": "add или remove",
     "qty": "количество если указано, иначе пустая строка. Примеры: 2 шт, 1 л, 500 г, 1 уп",
     "category": "одна из: Мясо и рыба, Молочное, Напитки, Сладкое, Фрукты и овощи, Хлеб, Яйца, Готовая еда, Соусы и приправы, Заморозка, Бытовая химия, Гигиена, Крупы и макароны, Консервы, Специи, Для дома, Прочее",
-    "emoji": "один эмодзи максимально похожий на этот конкретный продукт"
+    "emoji": "один эмодзи максимально похожий на этот конкретный продукт",
+    "shelfDays": "сколько дней этот продукт хранится в холодильнике (число). Например: молоко=5, курица=3, сыр=14, колбаса=7, овощи=7, готовая еда=3, заморозка=90. Для склада=0"
   }
 ]`;
 
@@ -1099,6 +1100,7 @@ function processAIProducts(aiProducts) {
         qty: p.qty || '',
         category: p.category || 'Прочее',
         emoji: p.emoji || '',
+        shelfDays: parseInt(p.shelfDays) || 0,
         addedAt: Date.now(),
         time: timeStr
       });
@@ -1413,12 +1415,19 @@ function renderGroup(containerId, emptyId, itemList) {
       // Срок свежести (только для холодильника)
       const isStorage = STORAGE_CATEGORIES.has(item.category);
       const daysOld = item.addedAt ? Math.floor((Date.now() - item.addedAt) / 86400000) : 0;
+      const shelf = item.shelfDays || 0;
       let freshClass = 'fresh';
       let ageText = '';
-      if (!isStorage) {
-        if (daysOld >= 5) { freshClass = 'old'; ageText = `${daysOld}д ⚠️`; }
-        else if (daysOld >= 3) { freshClass = 'aging'; ageText = `${daysOld}д`; }
-        else if (daysOld >= 1) { ageText = `${daysOld}д`; }
+      if (!isStorage && shelf > 0) {
+        const daysLeft = shelf - daysOld;
+        if (daysLeft <= 0) { freshClass = 'old'; ageText = `Просрочен!`; }
+        else if (daysLeft <= 1) { freshClass = 'old'; ageText = `Последний день!`; }
+        else if (daysLeft <= 2) { freshClass = 'aging'; ageText = `${daysLeft}д осталось`; }
+        else { ageText = `${daysLeft}д`; }
+      } else if (!isStorage && daysOld >= 5) {
+        freshClass = 'old'; ageText = `${daysOld}д ⚠️`;
+      } else if (!isStorage && daysOld >= 3) {
+        freshClass = 'aging'; ageText = `${daysOld}д`;
       }
       const ageHtml = ageText ? `<div class="item-age ${freshClass}">${ageText}</div>` : '';
 
