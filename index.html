@@ -1338,7 +1338,18 @@ async function callGemini(parts, _retryCount) {
       return null;
     }
 
-    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Gemini 2.5 может вернуть thinking-блоки — берём последний текстовый part без thought
+    const allParts = data.candidates?.[0]?.content?.parts || [];
+    let raw = '';
+    for (let i = allParts.length - 1; i >= 0; i--) {
+      if (allParts[i].text && !allParts[i].thought) { raw = allParts[i].text; break; }
+    }
+    if (!raw) {
+      // Fallback — берём последний part с текстом
+      for (let i = allParts.length - 1; i >= 0; i--) {
+        if (allParts[i].text) { raw = allParts[i].text; break; }
+      }
+    }
     if (!raw) {
       const finishReason = data.candidates?.[0]?.finishReason || 'unknown';
       console.warn(`[AI #${callNum}] Нет текста, finishReason:`, finishReason);
