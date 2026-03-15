@@ -823,6 +823,7 @@
       Получите бесплатный ключ на<br><a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>
     </div>
     <input class="modal-input" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off">
+    <div id="usageStats" style="background:#191919;border:1px solid #2a2a2a;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#888;"></div>
     <div class="modal-buttons">
       <button class="modal-btn secondary" onclick="closeSettings()">Отмена</button>
       <button class="modal-btn primary" onclick="saveApiKey()">Сохранить</button>
@@ -949,6 +950,7 @@ let items = loadItems();
 // ─── SETTINGS MODAL ───────────────────────────────────────────
 function showSettings() {
   document.getElementById('apiKeyInput').value = getApiKey();
+  renderUsageStats();
   document.getElementById('settingsModal').classList.add('visible');
 }
 function closeSettings() {
@@ -1033,6 +1035,32 @@ ${AI_RULES}
 }
 
 // ─── AI: ВЫЗОВ GEMINI ────────────────────────────────────────
+// ─── СЧЁТЧИК ЗАПРОСОВ ─────────────────────────────────────────
+const USAGE_KEY = 'fridge_api_usage';
+
+function getUsage() {
+  try {
+    const data = JSON.parse(localStorage.getItem(USAGE_KEY)) || {};
+    const today = new Date().toISOString().slice(0, 10);
+    if (data.date !== today) return { date: today, count: 0 };
+    return data;
+  } catch(e) { return { date: new Date().toISOString().slice(0, 10), count: 0 }; }
+}
+
+function addUsage() {
+  const u = getUsage();
+  u.count++;
+  localStorage.setItem(USAGE_KEY, JSON.stringify(u));
+}
+
+function renderUsageStats() {
+  const u = getUsage();
+  const el = document.getElementById('usageStats');
+  if (el) {
+    el.innerHTML = `📊 Сегодня запросов: <strong style="color:#e0e0e0">${u.count}</strong> <span style="color:#555">/ лимит ~20–500 в день</span>`;
+  }
+}
+
 // Сжатие картинки перед отправкой в AI
 function compressImage(base64data, mimeType) {
   return new Promise((resolve) => {
@@ -1083,6 +1111,7 @@ async function callGemini(parts) {
     );
 
     console.log(`[AI #${callNum}] Статус: ${resp.status}`);
+    if (resp.ok) addUsage();
 
     if (resp.status === 429) {
       const errData = await resp.json().catch(() => ({}));
