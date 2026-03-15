@@ -1033,9 +1033,15 @@ ${AI_RULES}
 }
 
 // ─── AI: ВЫЗОВ GEMINI ────────────────────────────────────────
+let apiCallCount = 0;
+
 async function callGemini(parts) {
   const key = getApiKey();
   if (!key) return null;
+
+  apiCallCount++;
+  const callNum = apiCallCount;
+  console.log(`[AI #${callNum}] Запрос отправлен...`);
 
   try {
     const resp = await fetch(
@@ -1050,21 +1056,29 @@ async function callGemini(parts) {
       }
     );
 
+    console.log(`[AI #${callNum}] Статус: ${resp.status}`);
+
     if (resp.status === 429) {
+      const errData = await resp.json().catch(() => ({}));
+      console.warn(`[AI #${callNum}] RATE LIMIT 429:`, errData);
       showToast('Подождите немного — слишком много запросов');
       return null;
     }
     if (!resp.ok) {
-      console.warn('Gemini API error:', resp.status);
+      const errData = await resp.json().catch(() => ({}));
+      console.warn(`[AI #${callNum}] Ошибка ${resp.status}:`, errData);
       return null;
     }
 
     const data = await resp.json();
+    console.log(`[AI #${callNum}] Ответ:`, data);
     let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     raw = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    console.log(`[AI #${callNum}] Распарсено:`, parsed);
+    return parsed;
   } catch(e) {
-    console.warn('AI parse error:', e);
+    console.warn(`[AI #${callNum}] Ошибка:`, e);
     return null;
   }
 }
