@@ -286,6 +286,13 @@
     flex-shrink: 0;
   }
 
+  .item-emoji {
+    font-size: 22px;
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+  }
+
   .item-name {
     flex: 1;
     font-size: 16px;
@@ -372,6 +379,275 @@
     letter-spacing: 1px;
     font-weight: 600;
   }
+
+  /* SETTINGS */
+  .settings-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #666;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+  }
+
+  .settings-btn:active { background: #333; }
+
+  .ai-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-left: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .ai-badge.on { background: #1a3a1a; color: #6dbf6d; border: 1px solid #2a5a2a; }
+  .ai-badge.off { background: #2a2222; color: #886; border: 1px solid #3a3020; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.visible { display: flex; }
+
+  .modal-box {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 20px;
+    padding: 28px 24px;
+    max-width: 360px;
+    width: 100%;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e0e0e0;
+    margin-bottom: 6px;
+  }
+
+  .modal-desc {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .modal-desc a {
+    color: #8ab4f8;
+    text-decoration: none;
+  }
+
+  .modal-input {
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #e0e0e0;
+    font-size: 15px;
+    font-family: monospace;
+    outline: none;
+    margin-bottom: 16px;
+  }
+
+  .modal-input:focus { border-color: #555; }
+
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .modal-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .modal-btn.primary {
+    background: linear-gradient(135deg, #555 0%, #444 100%);
+    color: #fff;
+  }
+
+  .modal-btn.secondary {
+    background: #2a2a2a;
+    color: #999;
+  }
+
+  .modal-btn:active { transform: scale(0.97); }
+
+  /* AI PROCESSING INDICATOR */
+  .voice-btn.processing .voice-mic {
+    background: linear-gradient(135deg, #7a6a30 0%, #5a4a20 100%);
+    animation: micPulse 0.6s infinite;
+  }
+
+  /* INPUT BUTTONS ROW */
+  .input-section {
+    padding: 24px 20px 16px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .input-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #2a2a2a 0%, #222 100%);
+    border: 1.5px solid #444;
+    border-radius: 18px;
+    padding: 18px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+  }
+
+  .input-btn:active {
+    transform: scale(0.98);
+    border-color: #888;
+  }
+
+  .input-btn.listening,
+  .input-btn.processing {
+    border-color: #aaa;
+    background: linear-gradient(135deg, #2f2f2f 0%, #272727 100%);
+  }
+
+  .input-btn .btn-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #666 0%, #444 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    transition: all 0.2s;
+  }
+
+  .input-btn.listening .btn-icon,
+  .input-btn.processing .btn-icon {
+    animation: micPulse 0.8s infinite;
+  }
+
+  .input-btn.processing .btn-icon {
+    background: linear-gradient(135deg, #7a6a30 0%, #5a4a20 100%);
+  }
+
+  .input-btn .btn-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e0e0e0;
+  }
+
+  .input-btn .btn-hint {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+  }
+
+  /* PHOTO PREVIEW */
+  .photo-preview {
+    margin: 0 20px 16px;
+    border-radius: 14px;
+    overflow: hidden;
+    display: none;
+    border: 1px solid #333;
+  }
+
+  .photo-preview.visible { display: block; }
+
+  .photo-preview img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* TEXT INPUT (iOS) */
+  .text-input-section {
+    margin: 0 20px 16px;
+    display: none;
+  }
+
+  .text-input-section.visible {
+    display: flex;
+    gap: 10px;
+  }
+
+  .text-input {
+    flex: 1;
+    background: #1e1e1e;
+    border: 1.5px solid #444;
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: #e0e0e0;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    outline: none;
+    min-height: 48px;
+    resize: none;
+  }
+
+  .text-input:focus {
+    border-color: #777;
+  }
+
+  .text-input::placeholder {
+    color: #555;
+  }
+
+  .text-send-btn {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #555 0%, #444 100%);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+    align-self: flex-end;
+    transition: all 0.15s;
+  }
+
+  .text-send-btn:active {
+    transform: scale(0.93);
+  }
+
+  /* QUANTITY */
+  .item-qty {
+    font-size: 12px;
+    color: #888;
+    background: #252525;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
 </style>
 </head>
 <body>
@@ -382,23 +658,54 @@
       <div class="logo-icon">❄️</div>
       <div class="logo-text">Ай<span>Холодильник</span></div>
     </div>
-    <div class="sync-status live" id="syncStatus">
-      <span class="sync-dot"></span>В сети
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="ai-badge on" id="aiBadge">AI</span>
+      <button class="settings-btn" onclick="showSettings()">⚙️</button>
     </div>
   </div>
 </div>
 
-<div class="voice-section">
-  <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
-    <div class="voice-mic">🎤</div>
-    <div class="voice-text">
-      <div class="voice-title">Скажите что положили</div>
-      <div class="voice-subtitle" id="voiceSubtitle">Нажмите и говорите: "купил молоко, хлеб, котлетки"</div>
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-box">
+    <div class="modal-title">🤖 Подключить AI</div>
+    <div class="modal-desc">
+      AI точно распознаёт продукты, раскладывает по полкам и подбирает эмодзи.<br><br>
+      Получите бесплатный ключ на<br><a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>
+    </div>
+    <input class="modal-input" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off">
+    <div class="modal-buttons">
+      <button class="modal-btn secondary" onclick="closeSettings()">Отмена</button>
+      <button class="modal-btn primary" onclick="saveApiKey()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="input-section">
+  <button class="input-btn" id="voiceBtn" onclick="toggleVoice()">
+    <div class="btn-icon" id="voiceBtnIcon">🎤</div>
+    <div>
+      <div class="btn-label" id="voiceLabel">Голосом</div>
+      <div class="btn-hint" id="voiceHint">Скажите что купили</div>
     </div>
   </button>
+  <button class="input-btn" id="photoBtn" onclick="document.getElementById('photoInput').click()">
+    <div class="btn-icon">📸</div>
+    <div>
+      <div class="btn-label">Скриншот</div>
+      <div class="btn-hint">Фото заказа</div>
+    </div>
+  </button>
+  <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+</div>
+
+<div class="text-input-section" id="textInputSection">
+  <textarea class="text-input" id="textInput" placeholder="Диктуйте через 🎤 на клавиатуре или печатайте..." rows="1"></textarea>
+  <button class="text-send-btn" onclick="submitTextInput()">➜</button>
 </div>
 
 <div class="transcript-box" id="transcriptBox"></div>
+<div class="photo-preview" id="photoPreview"><img id="photoImg"></div>
 
 <div class="stats-bar">
   <div class="stat-chip">
@@ -415,148 +722,165 @@
   <div class="empty-state" id="emptyState">
     <div class="empty-icon">🫙</div>
     <div class="empty-title">Холодильник пуст</div>
-    <div class="empty-sub">Нажмите на микрофон<br>и скажите что положили</div>
+    <div class="empty-sub">Скажите голосом или<br>загрузите скриншот заказа</div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── КАТЕГОРИИ ───────────────────────────────────────────────
-const CATEGORIES = {
-  'Мясо и рыба': {
-    emoji: '🥩',
-    keywords: ['котлет', 'мясо', 'курица', 'куриц', 'рыба', 'рыб', 'говядин', 'свинин', 'фарш', 'сосиск', 'сардел', 'колбас', 'ветчин', 'бекон', 'стейк', 'шашлык', 'креветк', 'индейк', 'баранин', 'пельмен', 'котлет', 'отбивн', 'карбонад', 'буженин', 'паштет', 'тефтел']
-  },
-  'Молочное': {
-    emoji: '🥛',
-    keywords: ['молоко', 'молок', 'кефир', 'йогурт', 'творог', 'сметан', 'масло', 'сыр', 'ряженк', 'простоквашу', 'сливки', 'мороженое']
-  },
-  'Напитки': {
-    emoji: '🥤',
-    keywords: ['кола', 'кока', 'пепси', 'сок', 'вода', 'компот', 'лимонад', 'квас', 'пиво', 'вино', 'чай', 'кофе', 'энергетик', 'sprite', 'фанта', 'морс']
-  },
-  'Сладкое': {
-    emoji: '🍬',
-    keywords: ['шоколад', 'конфет', 'торт', 'пирожн', 'печень', 'вафл', 'карамел', 'зефир', 'мармелад', 'халва', 'мёд', 'варень', 'джем']
-  },
-  'Фрукты и овощи': {
-    emoji: '🥦',
-    keywords: ['яблок', 'банан', 'апельсин', 'лимон', 'помидор', 'огурец', 'огурц', 'морков', 'картофел', 'картошк', 'лук', 'чеснок', 'перец', 'капуст', 'виноград', 'клубник', 'черешн', 'груш', 'персик', 'арбуз', 'дыня', 'зелень', 'салат', 'шпинат']
-  },
-  'Хлеб': {
-    emoji: '🍞',
-    keywords: ['хлеб', 'батон', 'булк', 'лаваш', 'багет', 'тост', 'выпечк', 'булочк', 'пирог']
-  },
-  'Яйца': {
-    emoji: '🥚',
-    keywords: ['яйц', 'яйко', 'яйка']
-  },
-  'Готовая еда': {
-    emoji: '🍱',
-    keywords: ['суп', 'борщ', 'каша', 'пельмен', 'вареник', 'блин', 'пицц', 'роллы', 'суши', 'лапш', 'макарон', 'рис', 'гречк', 'остатк']
-  },
-  'Соусы и прочее': {
-    emoji: '🫙',
-    keywords: ['кетчуп', 'майонез', 'горчиц', 'соус', 'уксус', 'масло', 'маринад', 'оливк', 'огурц', 'консерв']
-  }
+// ─── КАТЕГОРИИ (эмодзи для заголовков) ───────────────────────
+const CATEGORY_EMOJI = {
+  'Мясо и рыба': '🥩', 'Молочное': '🥛', 'Напитки': '🥤',
+  'Сладкое': '🍬', 'Фрукты и овощи': '🥦', 'Хлеб': '🍞',
+  'Яйца': '🥚', 'Готовая еда': '🍱', 'Соусы и приправы': '🫙',
+  'Заморозка': '🧊', 'Прочее': '📦'
 };
 
 // ─── ХРАНИЛИЩЕ ────────────────────────────────────────────────
-const STORAGE_KEY = 'fridge_items_v1';
+const STORAGE_KEY = 'fridge_items_v2';
+const API_KEY_STORAGE = 'fridge_gemini_key';
+const DEFAULT_API_KEY = 'AIzaSyAUZVdCC1VOlC-WDjc89ZkOSZCEgDaXnAI';
 
 function loadItems() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch(e) { return []; }
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
 }
+function saveItems(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
 
-function saveItems(items) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-}
+function getApiKey() { return localStorage.getItem(API_KEY_STORAGE) || DEFAULT_API_KEY; }
+function setApiKey(k) { localStorage.setItem(API_KEY_STORAGE, k); updateAiBadge(); }
 
 let items = loadItems();
 
-// ─── КАТЕГОРИЗАЦИЯ ────────────────────────────────────────────
-function getCategory(name) {
-  const lower = name.toLowerCase();
-  for (const [cat, data] of Object.entries(CATEGORIES)) {
-    for (const kw of data.keywords) {
-      if (lower.includes(kw)) return cat;
-    }
-  }
-  return 'Прочее';
+// ─── SETTINGS MODAL ───────────────────────────────────────────
+function showSettings() {
+  document.getElementById('apiKeyInput').value = getApiKey();
+  document.getElementById('settingsModal').classList.add('visible');
+}
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('visible');
+}
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  setApiKey(key);
+  closeSettings();
+  showToast(key ? 'AI подключён!' : 'AI отключён');
+}
+function updateAiBadge() {
+  const badge = document.getElementById('aiBadge');
+  badge.className = 'ai-badge on';
+  badge.textContent = 'AI';
 }
 
 function getCategoryEmoji(cat) {
-  return CATEGORIES[cat]?.emoji || '📦';
+  return CATEGORY_EMOJI[cat] || '📦';
 }
 
-// ─── ПАРСИНГ ГОЛОСА ───────────────────────────────────────────
-function parseVoiceInput(text) {
-  let clean = text.toLowerCase().trim();
+// ─── AI: ОБЩИЙ ПРОМПТ ────────────────────────────────────────
+const AI_JSON_FORMAT = `[
+  {
+    "name": "Название продукта (с большой буквы, кратко и понятно)",
+    "qty": "количество если указано, иначе пустая строка. Примеры: 2 шт, 1 л, 500 г, 1 уп",
+    "category": "одна из: Мясо и рыба, Молочное, Напитки, Сладкое, Фрукты и овощи, Хлеб, Яйца, Готовая еда, Соусы и приправы, Заморозка, Прочее",
+    "emoji": "один эмодзи максимально похожий на этот конкретный продукт"
+  }
+]`;
 
-  // Убираем служебные фразы целиком
-  ['в холодильник', 'в холодос', 'в холод', 'домой', 'только что', 'сегодня', 'туда', 'сюда'].forEach(p => {
-    clean = clean.replace(new RegExp(p, 'g'), ' ');
-  });
+const AI_RULES = `Правила:
+- "Макароны с томатным соусом" — это ОДИН продукт (готовое блюдо), не разбивай на части
+- "Паста с песто" — это ОДИН продукт
+- Составные блюда (салат оливье, борщ, суп с фрикадельками) — один продукт
+- Если несколько отдельных продуктов — каждый отдельным объектом
+- Убирай служебные слова (купил, положил, в холодильник, заказал и т.п.)
+- Названия пиши как на ценнике в магазине: кратко и понятно
+- Если есть количество/вес/объём — укажи в qty
+- Если нет продуктов — верни пустой массив []`;
 
-  // Убираем служебные слова (через пробелы, \b не работает с кириллицей)
-  ['купил','купила','положил','положила','добавил','добавила','заказал','заказала',
-   'принёс','принесла','поставил','поставила','лежит','стоит','есть','имеется',
-   'вот','там','тут','здесь','ещё','еще','также','плюс','ну','это','у','в','на','и'].forEach(w => {
-    clean = clean.replace(new RegExp('(^|\\s)' + w + '(\\s|$)', 'g'), ' ');
-  });
-  clean = clean.replace(/\s+/g, ' ').trim();
+// ─── AI: ПАРСИНГ ГОЛОСА ──────────────────────────────────────
+async function parseWithAI(text) {
+  const prompt = `Ты — умный помощник для приложения "холодильник". Пользователь голосом сказал что положил в холодильник. Извлеки ВСЕ продукты.
 
-  clean = clean.replace(/\s+/g, ' ').trim();
+Фраза: "${text}"
 
-  // Разбиваем по запятым или " и "
-  let parts;
-  if (clean.includes(',') || clean.includes(';')) {
-    parts = clean.split(/[,;]|\s+и\s+/).map(p => p.trim()).filter(p => p.length > 1);
-  } else {
-    // Нет запятых — разбиваем по пробелам, но склеиваем прилагательные с следующим словом
-    const words = clean.split(/\s+и\s+|\s+/).filter(p => p.length > 1);
-    const merged = [];
-    const adjEndings = /[а-я](ый|ий|ая|яя|ое|ее|ые|ие|ого|его|ому|ему|ую|юю|ым|им|ыми|ими)$/;
-    for (let i = 0; i < words.length; i++) {
-      if (adjEndings.test(words[i]) && i + 1 < words.length) {
-        // Это прилагательное — склеиваем с следующим словом
-        merged.push(words[i] + ' ' + words[i + 1]);
-        i++; // пропускаем следующее слово
-      } else {
-        merged.push(words[i]);
+Верни ТОЛЬКО валидный JSON-массив (без markdown, без \`\`\`):
+${AI_JSON_FORMAT}
+
+${AI_RULES}`;
+
+  return await callGemini([{ text: prompt }]);
+}
+
+// ─── AI: ПАРСИНГ СКРИНШОТА ───────────────────────────────────
+async function parseImageWithAI(base64data, mimeType) {
+  const prompt = `Ты — умный помощник для приложения "холодильник". Пользователь загрузил скриншот из приложения доставки продуктов или из чека магазина. Найди ВСЕ продукты на изображении.
+
+Верни ТОЛЬКО валидный JSON-массив (без markdown, без \`\`\`):
+${AI_JSON_FORMAT}
+
+${AI_RULES}
+- Внимательно прочитай каждую строку на скриншоте
+- Если видишь количество (2 шт, 500г, 1л) — укажи в qty
+- Если видишь цену, но не количество — qty оставь пустым, цены не добавляй`;
+
+  return await callGemini([
+    { text: prompt },
+    { inlineData: { mimeType: mimeType, data: base64data } }
+  ]);
+}
+
+// ─── AI: ВЫЗОВ GEMINI ────────────────────────────────────────
+async function callGemini(parts) {
+  const key = getApiKey();
+  if (!key) return null;
+
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 2048 }
+        })
       }
-    }
-    parts = merged;
-  }
+    );
 
-  const stopWords = new Set(['и','или','ну','вот','там','тут','это','ещё','еще','уже']);
-  const result = [];
-  for (let part of parts) {
-    part = part.trim();
-    if (part.length < 2 || stopWords.has(part)) continue;
-    result.push(part.charAt(0).toUpperCase() + part.slice(1));
+    if (!resp.ok) {
+      console.warn('Gemini API error:', resp.status);
+      return null;
+    }
+
+    const data = await resp.json();
+    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    raw = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    const parsed = JSON.parse(raw);
+
+    if (!Array.isArray(parsed)) return null;
+    return parsed.filter(p => p.name && p.name.length >= 2);
+  } catch(e) {
+    console.warn('AI parse error:', e);
+    return null;
   }
-  return result;
 }
 
 // ─── ДОБАВЛЕНИЕ ПРОДУКТОВ ─────────────────────────────────────
-function addItems(names) {
+function addItemsFromAI(aiProducts) {
   const now = new Date();
   const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-
   let added = 0;
-  for (const name of names) {
-    if (name.length < 2) continue;
-    // Не дублируем
-    const exists = items.find(i => i.name.toLowerCase() === name.toLowerCase());
+
+  for (const p of aiProducts) {
+    if (p.name.length < 2) continue;
+    const exists = items.find(i => i.name.toLowerCase() === p.name.toLowerCase());
     if (!exists) {
       items.push({
         id: Date.now() + Math.random(),
-        name: name,
-        category: getCategory(name),
+        name: p.name,
+        qty: p.qty || '',
+        category: p.category || 'Прочее',
+        emoji: p.emoji || '',
         time: timeStr
       });
       added++;
@@ -566,7 +890,7 @@ function addItems(names) {
   if (added > 0) {
     saveItems(items);
     renderAll();
-    showToast(added === 1 ? `Добавлено: ${names[0]}` : `Добавлено ${added} продукта(-ов)`);
+    showToast(added === 1 ? `Добавлено: ${aiProducts[0].name}` : `Добавлено ${added} продукта(-ов)`);
   }
 }
 
@@ -576,6 +900,88 @@ function removeItem(id) {
   saveItems(items);
   renderAll();
   if (item) showToast(`Убрано: ${item.name}`);
+}
+
+// ─── ОБРАБОТКА ГОЛОСОВОГО ТЕКСТА ──────────────────────────────
+async function processVoiceText(text) {
+  const btn = document.getElementById('voiceBtn');
+  const hint = document.getElementById('voiceHint');
+  const transcript = document.getElementById('transcriptBox');
+
+  btn.classList.add('processing');
+  hint.textContent = 'AI анализирует...';
+
+  const aiResult = await parseWithAI(text);
+
+  btn.classList.remove('processing');
+  hint.textContent = 'Скажите что купили';
+
+  if (aiResult && aiResult.length > 0) {
+    addItemsFromAI(aiResult);
+    setTimeout(() => { transcript.className = 'transcript-box'; }, 2000);
+  } else if (aiResult && aiResult.length === 0) {
+    showToast('Не нашёл продуктов — попробуйте ещё раз');
+    setTimeout(() => { transcript.className = 'transcript-box'; }, 2000);
+  } else {
+    transcript.textContent = '🔧 Холодильник на ремонте — попробуйте через минуту';
+    hint.textContent = 'AI временно недоступен';
+    setTimeout(() => { transcript.className = 'transcript-box'; }, 4000);
+  }
+}
+
+// ─── ОБРАБОТКА СКРИНШОТА ──────────────────────────────────────
+async function handlePhoto(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const photoBtn = document.getElementById('photoBtn');
+  const preview = document.getElementById('photoPreview');
+  const previewImg = document.getElementById('photoImg');
+  const transcript = document.getElementById('transcriptBox');
+
+  // Показать превью
+  const url = URL.createObjectURL(file);
+  previewImg.src = url;
+  preview.classList.add('visible');
+
+  // Конвертируем в base64
+  const base64 = await new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.readAsDataURL(file);
+  });
+
+  photoBtn.classList.add('processing');
+  transcript.className = 'transcript-box visible';
+  transcript.textContent = 'AI сканирует скриншот...';
+
+  const aiResult = await parseImageWithAI(base64, file.type || 'image/jpeg');
+
+  photoBtn.classList.remove('processing');
+
+  if (aiResult && aiResult.length > 0) {
+    addItemsFromAI(aiResult);
+    transcript.textContent = `Найдено ${aiResult.length} продукт(ов) на скриншоте`;
+    setTimeout(() => {
+      transcript.className = 'transcript-box';
+      preview.classList.remove('visible');
+    }, 3000);
+  } else if (aiResult && aiResult.length === 0) {
+    transcript.textContent = 'Не нашёл продуктов на скриншоте';
+    setTimeout(() => {
+      transcript.className = 'transcript-box';
+      preview.classList.remove('visible');
+    }, 3000);
+  } else {
+    transcript.textContent = '🔧 Холодильник на ремонте — попробуйте через минуту';
+    setTimeout(() => {
+      transcript.className = 'transcript-box';
+      preview.classList.remove('visible');
+    }, 4000);
+  }
+
+  // Сбрасываем input чтобы можно было загрузить тот же файл повторно
+  event.target.value = '';
 }
 
 // ─── РЕНДЕР ───────────────────────────────────────────────────
@@ -593,7 +999,6 @@ function renderAll() {
     return;
   }
 
-  // Группируем по категориям
   const groups = {};
   for (const item of items) {
     if (!groups[item.category]) groups[item.category] = [];
@@ -605,27 +1010,29 @@ function renderAll() {
   for (const [cat, catItems] of Object.entries(groups)) {
     const block = document.createElement('div');
     block.className = 'category-block';
-
-    const emoji = getCategoryEmoji(cat);
+    const catEmoji = getCategoryEmoji(cat);
 
     block.innerHTML = `
       <div class="category-header">
-        <span class="category-emoji">${emoji}</span>
+        <span class="category-emoji">${catEmoji}</span>
         <span class="category-name">${cat}</span>
         <span class="category-count">${catItems.length}</span>
       </div>
-      <div class="items-list" id="list_${cat.replace(/\s/g,'_')}"></div>
+      <div class="items-list"></div>
     `;
 
     container.appendChild(block);
-
     const list = block.querySelector('.items-list');
+
     for (const item of catItems) {
       const row = document.createElement('div');
       row.className = 'item-row';
+      const itemEmoji = item.emoji || '';
+      const qtyHtml = item.qty ? `<div class="item-qty">${item.qty}</div>` : '';
       row.innerHTML = `
-        <div class="item-dot"></div>
+        ${itemEmoji ? `<div class="item-emoji">${itemEmoji}</div>` : '<div class="item-dot"></div>'}
         <div class="item-name">${item.name}</div>
+        ${qtyHtml}
         <div class="item-time">${item.time}</div>
         <div class="item-delete" onclick="removeItem(${item.id})">×</div>
       `;
@@ -634,71 +1041,101 @@ function renderAll() {
   }
 }
 
+// ─── ОПРЕДЕЛЕНИЕ ПЛАТФОРМЫ ────────────────────────────────────
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
 // ─── ГОЛОСОВОЙ ВВОД ───────────────────────────────────────────
 let recognition = null;
 let isListening = false;
+let textInputVisible = false;
 
 function toggleVoice() {
-  if (isListening) {
-    stopVoice();
+  if (isIOS) {
+    // iOS: показываем текстовое поле с клавиатурой Apple
+    toggleTextInput();
+    return;
+  }
+  // Android: Web Speech API
+  if (isListening) stopVoice();
+  else startVoice();
+}
+
+function toggleTextInput() {
+  const section = document.getElementById('textInputSection');
+  const input = document.getElementById('textInput');
+  textInputVisible = !textInputVisible;
+  if (textInputVisible) {
+    section.classList.add('visible');
+    input.focus(); // откроет клавиатуру с 🎤
   } else {
-    startVoice();
+    section.classList.remove('visible');
+    input.value = '';
   }
 }
 
+async function submitTextInput() {
+  const input = document.getElementById('textInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  document.getElementById('textInputSection').classList.remove('visible');
+  textInputVisible = false;
+
+  const transcript = document.getElementById('transcriptBox');
+  transcript.className = 'transcript-box visible';
+  transcript.textContent = text;
+
+  await processVoiceText(text);
+}
+
 function startVoice() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    showToast('Голосовой ввод не поддерживается в этом браузере');
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    // Если Web Speech API нет — открываем текстовый ввод как фолбэк
+    toggleTextInput();
     return;
   }
 
-  recognition = new SpeechRecognition();
+  recognition = new SR();
   recognition.lang = 'ru-RU';
   recognition.continuous = false;
   recognition.interimResults = false;
 
   const btn = document.getElementById('voiceBtn');
-  const subtitle = document.getElementById('voiceSubtitle');
+  const hint = document.getElementById('voiceHint');
   const transcript = document.getElementById('transcriptBox');
 
   recognition.onstart = () => {
     isListening = true;
     btn.classList.add('listening');
-    subtitle.textContent = 'Слушаю... говорите';
+    hint.textContent = 'Слушаю...';
     transcript.className = 'transcript-box visible';
     transcript.textContent = '...';
   };
 
   recognition.onresult = (e) => {
-    // Берём только финальный результат последнего utterance
     const last = e.results[e.results.length - 1];
-    const text = last[0].transcript;
-    transcript.textContent = text;
+    transcript.textContent = last[0].transcript;
   };
 
   recognition.onend = () => {
     isListening = false;
     btn.classList.remove('listening');
-    subtitle.textContent = 'Нажмите и говорите: "купил молоко, хлеб, котлетки"';
 
     const text = transcript.textContent;
     if (text && text !== '...') {
-      const parsed = parseVoiceInput(text);
-      if (parsed.length > 0) {
-        addItems(parsed);
-        setTimeout(() => {
-          transcript.className = 'transcript-box';
-          transcript.textContent = '';
-        }, 2000);
-      }
+      processVoiceText(text);
+    } else {
+      hint.textContent = 'Скажите что купили';
     }
   };
 
   recognition.onerror = (e) => {
     isListening = false;
     btn.classList.remove('listening');
-    subtitle.textContent = 'Нажмите и говорите: "купил молоко, хлеб, котлетки"';
+    hint.textContent = 'Скажите что купили';
     transcript.className = 'transcript-box';
     if (e.error !== 'no-speech') showToast('Ошибка микрофона: ' + e.error);
   };
@@ -706,9 +1143,7 @@ function startVoice() {
   recognition.start();
 }
 
-function stopVoice() {
-  if (recognition) recognition.stop();
-}
+function stopVoice() { if (recognition) recognition.stop(); }
 
 // ─── TOAST ────────────────────────────────────────────────────
 let toastTimer = null;
@@ -730,7 +1165,23 @@ function clearAll() {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────
+updateAiBadge();
 renderAll();
+
+// iOS: обновляем подсказки
+if (isIOS) {
+  document.getElementById('voiceLabel').textContent = 'Текстом';
+  document.getElementById('voiceHint').textContent = 'Диктовка через 🎤';
+  document.getElementById('voiceBtnIcon').textContent = '⌨️';
+}
+
+// Enter в текстовом поле = отправить
+document.getElementById('textInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    submitTextInput();
+  }
+});
 </script>
 </body>
 </html>
