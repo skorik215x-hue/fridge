@@ -928,7 +928,7 @@ const STORAGE_CATEGORIES = new Set([
 // ─── ХРАНИЛИЩЕ ────────────────────────────────────────────────
 const STORAGE_KEY = 'fridge_items_v2';
 const API_KEY_STORAGE = 'fridge_gemini_key';
-const DEFAULT_API_KEY = atob('QUl6YVN5QXRuU001QldnSmNOWWxwUjg2NjFIWVBVSTQ5MWdqVWg4');
+const DEFAULT_API_KEY = atob('QUl6YVN5QU91LXVOS0hVU1loZkhMMGNIN0JuZE9RUUhRc1VPZlpB');
 
 function loadItems() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
@@ -939,7 +939,7 @@ function saveItems(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr))
 function getApiKey() {
   const stored = localStorage.getItem(API_KEY_STORAGE);
   // Если сохранён старый отозванный ключ — игнорируем
-  if (stored && (stored.includes('WDjc89Zk') || stored.includes('VUhFMUtH'))) { localStorage.removeItem(API_KEY_STORAGE); return DEFAULT_API_KEY; }
+  if (stored && (stored.includes('WDjc89Zk') || stored.includes('VUhFMUtH') || stored.includes('nSM5BWgJ'))) { localStorage.removeItem(API_KEY_STORAGE); return DEFAULT_API_KEY; }
   return stored || DEFAULT_API_KEY;
 }
 function setApiKey(k) { localStorage.setItem(API_KEY_STORAGE, k); updateAiBadge(); }
