@@ -754,6 +754,49 @@
     color: #444;
     font-size: 13px;
   }
+
+  /* TABS */
+  .tabs-bar {
+    display: flex;
+    gap: 0;
+    margin: 0 20px 16px;
+    background: #1a1a1a;
+    border-radius: 14px;
+    border: 1px solid #2a2a2a;
+    overflow: hidden;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 12px 0;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .tab-btn.active {
+    color: #e0e0e0;
+    background: #252525;
+  }
+
+  .tab-btn .tab-count {
+    font-size: 11px;
+    color: #555;
+    margin-left: 4px;
+  }
+
+  .tab-btn.active .tab-count {
+    color: #888;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 </style>
 </head>
 <body>
@@ -815,22 +858,41 @@
 <div class="transcript-box" id="transcriptBox"></div>
 <div class="photo-preview" id="photoPreview"><img id="photoImg"></div>
 
+<div class="tabs-bar">
+  <button class="tab-btn active" id="tabFridge" onclick="switchTab('fridge')">
+    ❄️ Холодильник <span class="tab-count" id="fridgeCount">0</span>
+  </button>
+  <button class="tab-btn" id="tabStorage" onclick="switchTab('storage')">
+    📦 Склад <span class="tab-count" id="storageCount">0</span>
+  </button>
+</div>
+
 <div class="stats-bar">
   <div class="stat-chip">
-    <strong id="totalCount">0</strong> продуктов
+    <strong id="totalCount">0</strong> всего
   </div>
   <div class="stat-chip" onclick="clearAll()" style="cursor:pointer; color:#666;">
     🗑 Очистить
   </div>
 </div>
 
-<div class="section-title">В холодильнике</div>
+<div class="tab-content active" id="fridgeTab">
+  <div class="categories" id="categoriesContainer">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🫙</div>
+      <div class="empty-title">Холодильник пуст</div>
+      <div class="empty-sub">Скажите голосом или<br>загрузите скриншот заказа</div>
+    </div>
+  </div>
+</div>
 
-<div class="categories" id="categoriesContainer">
-  <div class="empty-state" id="emptyState">
-    <div class="empty-icon">🫙</div>
-    <div class="empty-title">Холодильник пуст</div>
-    <div class="empty-sub">Скажите голосом или<br>загрузите скриншот заказа</div>
+<div class="tab-content" id="storageTab">
+  <div class="categories" id="storageContainer">
+    <div class="empty-state" id="emptyStorageState">
+      <div class="empty-icon">📦</div>
+      <div class="empty-title">Склад пуст</div>
+      <div class="empty-sub">Бытовая химия, бумага, крупы<br>попадут сюда автоматически</div>
+    </div>
   </div>
 </div>
 
@@ -852,8 +914,16 @@ const CATEGORY_EMOJI = {
   'Мясо и рыба': '🥩', 'Молочное': '🥛', 'Напитки': '🥤',
   'Сладкое': '🍬', 'Фрукты и овощи': '🥦', 'Хлеб': '🍞',
   'Яйца': '🥚', 'Готовая еда': '🍱', 'Соусы и приправы': '🫙',
-  'Заморозка': '🧊', 'Прочее': '📦'
+  'Заморозка': '🧊', 'Прочее': '📦',
+  // Склад
+  'Бытовая химия': '🧴', 'Гигиена': '🧻', 'Крупы и макароны': '🌾',
+  'Консервы': '🥫', 'Специи': '🧂', 'Для дома': '🏠'
 };
+
+// Категории которые идут на склад (не в холодильник)
+const STORAGE_CATEGORIES = new Set([
+  'Бытовая химия', 'Гигиена', 'Крупы и макароны', 'Консервы', 'Специи', 'Для дома'
+]);
 
 // ─── ХРАНИЛИЩЕ ────────────────────────────────────────────────
 const STORAGE_KEY = 'fridge_items_v2';
@@ -906,7 +976,7 @@ const AI_JSON_FORMAT = `[
     "name": "Название продукта (с большой буквы, кратко и понятно)",
     "action": "add или remove",
     "qty": "количество если указано, иначе пустая строка. Примеры: 2 шт, 1 л, 500 г, 1 уп",
-    "category": "одна из: Мясо и рыба, Молочное, Напитки, Сладкое, Фрукты и овощи, Хлеб, Яйца, Готовая еда, Соусы и приправы, Заморозка, Прочее",
+    "category": "одна из: Мясо и рыба, Молочное, Напитки, Сладкое, Фрукты и овощи, Хлеб, Яйца, Готовая еда, Соусы и приправы, Заморозка, Бытовая химия, Гигиена, Крупы и макароны, Консервы, Специи, Для дома, Прочее",
     "emoji": "один эмодзи максимально похожий на этот конкретный продукт"
   }
 ]`;
@@ -921,7 +991,13 @@ const AI_RULES = `Правила:
 - Убирай служебные слова (купил, положил, в холодильник, заказал и т.п.) из name
 - Названия пиши как на ценнике в магазине: кратко и понятно
 - Если есть количество/вес/объём — укажи в qty
-- Если нет продуктов — верни пустой массив []`;
+- Если нет продуктов — верни пустой массив []
+- Бытовая химия (моющие, порошки, губки) → категория "Бытовая химия"
+- Гигиена (туалетная бумага, мыло, шампунь, зубная паста) → "Гигиена"
+- Крупы, макароны, мука, сахар, соль → "Крупы и макароны"
+- Консервы (тушёнка, горошек, кукуруза в банках) → "Консервы"
+- Специи (перец, паприка, куркума) → "Специи"
+- Прочее для дома (салфетки, пакеты, фольга, свечи) → "Для дома"`;
 
 // ─── AI: ПАРСИНГ ГОЛОСА ──────────────────────────────────────
 async function parseWithAI(text) {
@@ -1209,7 +1285,7 @@ async function analyzeFridgePhoto(base64data, mimeType) {
       "name": "Название продукта",
       "action": "add",
       "qty": "количество если видно, иначе пустая строка",
-      "category": "одна из: Мясо и рыба, Молочное, Напитки, Сладкое, Фрукты и овощи, Хлеб, Яйца, Готовая еда, Соусы и приправы, Заморозка, Прочее",
+      "category": "одна из: Мясо и рыба, Молочное, Напитки, Сладкое, Фрукты и овощи, Хлеб, Яйца, Готовая еда, Соусы и приправы, Заморозка, Бытовая химия, Гигиена, Крупы и макароны, Консервы, Специи, Для дома, Прочее",
       "emoji": "один эмодзи продукта"
     }
   ],
@@ -1259,23 +1335,44 @@ async function analyzeFridgePhoto(base64data, mimeType) {
 }
 
 // ─── РЕНДЕР ───────────────────────────────────────────────────
+let currentTab = 'fridge';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tabFridge').classList.toggle('active', tab === 'fridge');
+  document.getElementById('tabStorage').classList.toggle('active', tab === 'storage');
+  document.getElementById('fridgeTab').classList.toggle('active', tab === 'fridge');
+  document.getElementById('storageTab').classList.toggle('active', tab === 'storage');
+}
+
 function renderAll() {
-  const container = document.getElementById('categoriesContainer');
-  const empty = document.getElementById('emptyState');
-  const totalCount = document.getElementById('totalCount');
+  const fridgeItems = items.filter(i => !STORAGE_CATEGORIES.has(i.category));
+  const storageItems = items.filter(i => STORAGE_CATEGORIES.has(i.category));
 
-  totalCount.textContent = items.length;
+  document.getElementById('totalCount').textContent = items.length;
+  document.getElementById('fridgeCount').textContent = fridgeItems.length;
+  document.getElementById('storageCount').textContent = storageItems.length;
 
-  // Показываем/скрываем секцию рецептов
+  // Рецепты
   const recipesSection = document.getElementById('recipesSection');
-  if (items.length >= 2) {
+  if (fridgeItems.length >= 2) {
     recipesSection.style.display = 'block';
   } else {
     recipesSection.style.display = 'none';
     recipesCache = [];
   }
 
-  if (items.length === 0) {
+  // Холодильник
+  renderGroup('categoriesContainer', 'emptyState', fridgeItems);
+  // Склад
+  renderGroup('storageContainer', 'emptyStorageState', storageItems);
+}
+
+function renderGroup(containerId, emptyId, itemList) {
+  const container = document.getElementById(containerId);
+  const empty = document.getElementById(emptyId);
+
+  if (itemList.length === 0) {
     container.innerHTML = '';
     container.appendChild(empty);
     empty.style.display = 'block';
@@ -1283,7 +1380,7 @@ function renderAll() {
   }
 
   const groups = {};
-  for (const item of items) {
+  for (const item of itemList) {
     if (!groups[item.category]) groups[item.category] = [];
     groups[item.category].push(item);
   }
@@ -1313,13 +1410,16 @@ function renderAll() {
       const itemEmoji = item.emoji || '';
       const qtyHtml = item.qty ? `<div class="item-qty">${item.qty}</div>` : '';
 
-      // Срок свежести
+      // Срок свежести (только для холодильника)
+      const isStorage = STORAGE_CATEGORIES.has(item.category);
       const daysOld = item.addedAt ? Math.floor((Date.now() - item.addedAt) / 86400000) : 0;
       let freshClass = 'fresh';
       let ageText = '';
-      if (daysOld >= 5) { freshClass = 'old'; ageText = `${daysOld}д ⚠️`; }
-      else if (daysOld >= 3) { freshClass = 'aging'; ageText = `${daysOld}д`; }
-      else if (daysOld >= 1) { ageText = `${daysOld}д`; }
+      if (!isStorage) {
+        if (daysOld >= 5) { freshClass = 'old'; ageText = `${daysOld}д ⚠️`; }
+        else if (daysOld >= 3) { freshClass = 'aging'; ageText = `${daysOld}д`; }
+        else if (daysOld >= 1) { ageText = `${daysOld}д`; }
+      }
       const ageHtml = ageText ? `<div class="item-age ${freshClass}">${ageText}</div>` : '';
 
       row.innerHTML = `
