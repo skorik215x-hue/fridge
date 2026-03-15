@@ -118,6 +118,14 @@
     );
   }
 
+  /* Все элементы контента поверх фона */
+  .header, .input-section, .text-input-section, .transcript-box,
+  .photo-preview, .tabs-bar, .stats-bar, .tab-content,
+  .recipes-section, .toast, .modal-overlay, .voice-section {
+    position: relative;
+    z-index: 1;
+  }
+
   /* HEADER */
   .header {
     background: linear-gradient(180deg, rgba(34,34,34,0.92) 0%, rgba(26,26,26,0.92) 100%);
