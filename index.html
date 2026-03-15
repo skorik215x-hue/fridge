@@ -648,6 +648,110 @@
     border-radius: 10px;
     white-space: nowrap;
   }
+
+  /* FRESHNESS */
+  .item-name.fresh { color: #ddd; }
+  .item-name.aging { color: #d4a94a; }
+  .item-name.old { color: #c75050; }
+
+  .item-age {
+    font-size: 10px;
+    color: #555;
+    white-space: nowrap;
+  }
+  .item-age.aging { color: #a08030; }
+  .item-age.old { color: #a04040; }
+
+  /* RECIPES SECTION */
+  .recipes-section {
+    padding: 0 20px 40px;
+  }
+
+  .recipes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .recipes-title {
+    font-size: 12px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  .recipes-refresh {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .recipes-refresh:active { background: #2a2a2a; color: #aaa; }
+  .recipes-refresh.loading { color: #666; pointer-events: none; }
+
+  .recipes-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  .recipes-scroll::-webkit-scrollbar { display: none; }
+
+  .recipe-card {
+    flex-shrink: 0;
+    width: 260px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 18px;
+    scroll-snap-align: start;
+    animation: itemIn 0.4s ease;
+  }
+
+  .recipe-emoji {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+
+  .recipe-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin-bottom: 6px;
+  }
+
+  .recipe-desc {
+    font-size: 13px;
+    color: #888;
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .recipe-ingredients {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  .recipe-ingredients span {
+    color: #8ab4f8;
+  }
+
+  .recipes-empty {
+    text-align: center;
+    padding: 30px;
+    color: #444;
+    font-size: 13px;
+  }
 </style>
 </head>
 <body>
@@ -726,6 +830,16 @@
   </div>
 </div>
 
+<div class="recipes-section" id="recipesSection" style="display:none;">
+  <div class="recipes-header">
+    <div class="recipes-title">Что приготовить?</div>
+    <button class="recipes-refresh" id="recipesRefreshBtn" onclick="loadRecipes()">Обновить</button>
+  </div>
+  <div class="recipes-scroll" id="recipesContainer">
+    <div class="recipes-empty">Добавьте продукты — подберём рецепты</div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -781,6 +895,7 @@ function getCategoryEmoji(cat) {
 const AI_JSON_FORMAT = `[
   {
     "name": "Название продукта (с большой буквы, кратко и понятно)",
+    "action": "add или remove",
     "qty": "количество если указано, иначе пустая строка. Примеры: 2 шт, 1 л, 500 г, 1 уп",
     "category": "одна из: Мясо и рыба, Молочное, Напитки, Сладкое, Фрукты и овощи, Хлеб, Яйца, Готовая еда, Соусы и приправы, Заморозка, Прочее",
     "emoji": "один эмодзи максимально похожий на этот конкретный продукт"
@@ -788,18 +903,20 @@ const AI_JSON_FORMAT = `[
 ]`;
 
 const AI_RULES = `Правила:
-- "Макароны с томатным соусом" — это ОДИН продукт (готовое блюдо), не разбивай на части
+- Определи ДЕЙСТВИЕ: если человек ДОБАВЛЯЕТ продукты (купил, положил, принёс) → action: "add"
+- Если человек УБИРАЕТ продукты (съел, выкинул, допил, забрал, использовал, приготовил) → action: "remove"
+- "Макароны с томатным соусом" — это ОДИН продукт, не разбивай на части
 - "Паста с песто" — это ОДИН продукт
 - Составные блюда (салат оливье, борщ, суп с фрикадельками) — один продукт
 - Если несколько отдельных продуктов — каждый отдельным объектом
-- Убирай служебные слова (купил, положил, в холодильник, заказал и т.п.)
+- Убирай служебные слова (купил, положил, в холодильник, заказал и т.п.) из name
 - Названия пиши как на ценнике в магазине: кратко и понятно
 - Если есть количество/вес/объём — укажи в qty
 - Если нет продуктов — верни пустой массив []`;
 
 // ─── AI: ПАРСИНГ ГОЛОСА ──────────────────────────────────────
 async function parseWithAI(text) {
-  const prompt = `Ты — умный помощник для приложения "холодильник". Пользователь голосом сказал что положил в холодильник. Извлеки ВСЕ продукты.
+  const prompt = `Ты — умный помощник для приложения "холодильник". Пользователь сказал фразу. Определи: он ДОБАВЛЯЕТ продукты или УБИРАЕТ (съел/выкинул). Извлеки ВСЕ продукты.
 
 Фраза: "${text}"
 
@@ -866,12 +983,27 @@ async function callGemini(parts) {
 }
 
 // ─── ДОБАВЛЕНИЕ ПРОДУКТОВ ─────────────────────────────────────
-function addItemsFromAI(aiProducts) {
+function processAIProducts(aiProducts) {
   const now = new Date();
   const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
   let added = 0;
+  let removed = 0;
 
-  for (const p of aiProducts) {
+  const toAdd = aiProducts.filter(p => p.action !== 'remove');
+  const toRemove = aiProducts.filter(p => p.action === 'remove');
+
+  // Удаляем
+  for (const p of toRemove) {
+    const lower = p.name.toLowerCase();
+    const idx = items.findIndex(i => i.name.toLowerCase().includes(lower) || lower.includes(i.name.toLowerCase()));
+    if (idx !== -1) {
+      items.splice(idx, 1);
+      removed++;
+    }
+  }
+
+  // Добавляем
+  for (const p of toAdd) {
     if (p.name.length < 2) continue;
     const exists = items.find(i => i.name.toLowerCase() === p.name.toLowerCase());
     if (!exists) {
@@ -881,16 +1013,23 @@ function addItemsFromAI(aiProducts) {
         qty: p.qty || '',
         category: p.category || 'Прочее',
         emoji: p.emoji || '',
+        addedAt: Date.now(),
         time: timeStr
       });
       added++;
     }
   }
 
-  if (added > 0) {
+  if (added > 0 || removed > 0) {
     saveItems(items);
     renderAll();
-    showToast(added === 1 ? `Добавлено: ${aiProducts[0].name}` : `Добавлено ${added} продукта(-ов)`);
+    if (removed > 0 && added === 0) {
+      showToast(removed === 1 ? `Убрано: ${toRemove[0].name}` : `Убрано ${removed} продукт(ов)`);
+    } else if (added > 0 && removed === 0) {
+      showToast(added === 1 ? `Добавлено: ${toAdd[0].name}` : `Добавлено ${added} продукт(ов)`);
+    } else {
+      showToast(`+${added}, −${removed}`);
+    }
   }
 }
 
@@ -917,8 +1056,10 @@ async function processVoiceText(text) {
   hint.textContent = 'Скажите что купили';
 
   if (aiResult && aiResult.length > 0) {
-    addItemsFromAI(aiResult);
+    processAIProducts(aiResult);
     setTimeout(() => { transcript.className = 'transcript-box'; }, 2000);
+    // Обновить рецепты после изменений
+    if (items.length >= 2) { recipesCache = []; loadRecipes(); }
   } else if (aiResult && aiResult.length === 0) {
     showToast('Не нашёл продуктов — попробуйте ещё раз');
     setTimeout(() => { transcript.className = 'transcript-box'; }, 2000);
@@ -960,8 +1101,9 @@ async function handlePhoto(event) {
   photoBtn.classList.remove('processing');
 
   if (aiResult && aiResult.length > 0) {
-    addItemsFromAI(aiResult);
+    processAIProducts(aiResult);
     transcript.textContent = `Найдено ${aiResult.length} продукт(ов) на скриншоте`;
+    if (items.length >= 2) { recipesCache = []; loadRecipes(); }
     setTimeout(() => {
       transcript.className = 'transcript-box';
       preview.classList.remove('visible');
@@ -991,6 +1133,15 @@ function renderAll() {
   const totalCount = document.getElementById('totalCount');
 
   totalCount.textContent = items.length;
+
+  // Показываем/скрываем секцию рецептов
+  const recipesSection = document.getElementById('recipesSection');
+  if (items.length >= 2) {
+    recipesSection.style.display = 'block';
+    if (recipesCache.length === 0) loadRecipes();
+  } else {
+    recipesSection.style.display = 'none';
+  }
 
   if (items.length === 0) {
     container.innerHTML = '';
@@ -1029,10 +1180,21 @@ function renderAll() {
       row.className = 'item-row';
       const itemEmoji = item.emoji || '';
       const qtyHtml = item.qty ? `<div class="item-qty">${item.qty}</div>` : '';
+
+      // Срок свежести
+      const daysOld = item.addedAt ? Math.floor((Date.now() - item.addedAt) / 86400000) : 0;
+      let freshClass = 'fresh';
+      let ageText = '';
+      if (daysOld >= 5) { freshClass = 'old'; ageText = `${daysOld}д ⚠️`; }
+      else if (daysOld >= 3) { freshClass = 'aging'; ageText = `${daysOld}д`; }
+      else if (daysOld >= 1) { ageText = `${daysOld}д`; }
+      const ageHtml = ageText ? `<div class="item-age ${freshClass}">${ageText}</div>` : '';
+
       row.innerHTML = `
         ${itemEmoji ? `<div class="item-emoji">${itemEmoji}</div>` : '<div class="item-dot"></div>'}
-        <div class="item-name">${item.name}</div>
+        <div class="item-name ${freshClass}">${item.name}</div>
         ${qtyHtml}
+        ${ageHtml}
         <div class="item-time">${item.time}</div>
         <div class="item-delete" onclick="removeItem(${item.id})">×</div>
       `;
@@ -1144,6 +1306,72 @@ function startVoice() {
 }
 
 function stopVoice() { if (recognition) recognition.stop(); }
+
+// ─── РЕЦЕПТЫ ─────────────────────────────────────────────────
+let recipesCache = [];
+
+async function loadRecipes() {
+  if (items.length < 2) return;
+
+  const section = document.getElementById('recipesSection');
+  const container = document.getElementById('recipesContainer');
+  const btn = document.getElementById('recipesRefreshBtn');
+  section.style.display = 'block';
+
+  btn.classList.add('loading');
+  btn.textContent = 'Думаю...';
+
+  const productList = items.map(i => `${i.emoji || ''} ${i.name}${i.qty ? ' (' + i.qty + ')' : ''}`).join(', ');
+
+  const prompt = `В холодильнике: ${productList}
+
+Предложи 3-4 простых блюда, которые можно приготовить из этих продуктов. Это для семьи с подростками — блюда должны быть вкусные, простые, понятные.
+
+Верни ТОЛЬКО валидный JSON-массив (без markdown, без \`\`\`):
+[
+  {
+    "emoji": "один эмодзи блюда",
+    "name": "Название блюда",
+    "desc": "Короткое описание в 1 предложение — как приготовить",
+    "from": "какие продукты из холодильника используются (через запятую)"
+  }
+]
+
+Правила:
+- Используй ТОЛЬКО то что есть в холодильнике, не выдумывай продуктов
+- Блюда простые, на 15-30 минут
+- Можно предположить что дома есть соль, перец, масло, вода
+- Названия весёлые и аппетитные`;
+
+  const result = await callGemini([{ text: prompt }]);
+
+  btn.classList.remove('loading');
+  btn.textContent = 'Обновить';
+
+  if (result && result.length > 0) {
+    recipesCache = result;
+    renderRecipes();
+  } else {
+    container.innerHTML = '<div class="recipes-empty">Не удалось подобрать рецепты</div>';
+  }
+}
+
+function renderRecipes() {
+  const container = document.getElementById('recipesContainer');
+  if (recipesCache.length === 0) {
+    container.innerHTML = '<div class="recipes-empty">Добавьте продукты — подберём рецепты</div>';
+    return;
+  }
+
+  container.innerHTML = recipesCache.map(r => `
+    <div class="recipe-card">
+      <div class="recipe-emoji">${r.emoji || '🍽'}</div>
+      <div class="recipe-name">${r.name}</div>
+      <div class="recipe-desc">${r.desc}</div>
+      <div class="recipe-ingredients">Из: <span>${r.from}</span></div>
+    </div>
+  `).join('');
+}
 
 // ─── TOAST ────────────────────────────────────────────────────
 let toastTimer = null;
