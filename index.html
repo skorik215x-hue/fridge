@@ -968,6 +968,10 @@ async function callGemini(parts) {
       }
     );
 
+    if (resp.status === 429) {
+      showToast('Подождите немного — слишком много запросов');
+      return null;
+    }
     if (!resp.ok) {
       console.warn('Gemini API error:', resp.status);
       return null;
@@ -976,10 +980,7 @@ async function callGemini(parts) {
     const data = await resp.json();
     let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     raw = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-    const parsed = JSON.parse(raw);
-
-    if (!Array.isArray(parsed)) return null;
-    return parsed.filter(p => p.name && p.name.length >= 2);
+    return JSON.parse(raw);
   } catch(e) {
     console.warn('AI parse error:', e);
     return null;
@@ -1264,9 +1265,9 @@ function renderAll() {
   const recipesSection = document.getElementById('recipesSection');
   if (items.length >= 2) {
     recipesSection.style.display = 'block';
-    if (recipesCache.length === 0) loadRecipes();
   } else {
     recipesSection.style.display = 'none';
+    recipesCache = [];
   }
 
   if (items.length === 0) {
@@ -1521,6 +1522,9 @@ function clearAll() {
 // ─── INIT ─────────────────────────────────────────────────────
 updateAiBadge();
 renderAll();
+
+// Загружаем рецепты 1 раз при старте если есть продукты
+if (items.length >= 2) loadRecipes();
 
 // iOS: обновляем подсказки
 if (isIOS) {
