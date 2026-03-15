@@ -13,17 +13,117 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   body {
-    background: #111;
+    background: #222;
     color: #e8e8e8;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
   }
 
+  /* === FRIDGE BACKGROUND === */
+  .fridge-wall-l, .fridge-wall-r {
+    position: fixed; top: 0; bottom: 0; width: 16px; z-index: 0;
+  }
+  .fridge-wall-l {
+    left: 0;
+    background: linear-gradient(90deg, #3a4858 0%, #5a6878 25%, #7a8898 45%, #8a98a8 55%, #a0b0c0 70%, #b8c8d8 85%, #c8d8e8 95%, #b0c0d0 100%);
+    border-right: 2px solid rgba(200,225,250,0.25);
+    box-shadow: inset -3px 0 8px rgba(0,0,0,0.2);
+  }
+  .fridge-wall-r {
+    right: 0;
+    background: linear-gradient(270deg, #3a4858 0%, #5a6878 25%, #7a8898 45%, #8a98a8 55%, #a0b0c0 70%, #b8c8d8 85%, #c8d8e8 95%, #b0c0d0 100%);
+    border-left: 2px solid rgba(200,225,250,0.25);
+    box-shadow: inset 3px 0 8px rgba(0,0,0,0.2);
+  }
+  .fridge-round-l, .fridge-round-r {
+    position: fixed; top: 0; bottom: 0; width: 12px; z-index: 0; pointer-events: none;
+  }
+  .fridge-round-l {
+    left: 16px;
+    background: linear-gradient(90deg, rgba(140,170,200,0.35) 0%, rgba(160,190,220,0.15) 40%, transparent 100%);
+  }
+  .fridge-round-r {
+    right: 16px;
+    background: linear-gradient(270deg, rgba(140,170,200,0.35) 0%, rgba(160,190,220,0.15) 40%, transparent 100%);
+  }
+  .fridge-inner {
+    position: fixed; top: 0; bottom: 0; left: 16px; right: 16px;
+    background: linear-gradient(180deg, #d0e2ef 0%, #c5d9e8 30%, #bad0e2 60%, #b0c8dc 100%);
+    z-index: 0;
+  }
+  .fridge-texture {
+    position: fixed; top: 0; bottom: 0; left: 16px; right: 16px;
+    z-index: 0; pointer-events: none; opacity: 0.08;
+    background:
+      repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.15) 2px, transparent 3px),
+      repeating-linear-gradient(90deg, transparent 0px, transparent 2px, rgba(0,0,0,0.08) 2px, transparent 3px);
+  }
+  .fridge-led {
+    position: fixed; top: 0; left: 16px; right: 16px; height: 6px; z-index: 0; pointer-events: none;
+    background: linear-gradient(90deg, rgba(180,215,250,0.1) 0%, rgba(200,230,255,0.7) 15%, rgba(220,240,255,0.95) 35%, rgba(235,248,255,1) 50%, rgba(220,240,255,0.95) 65%, rgba(200,230,255,0.7) 85%, rgba(180,215,250,0.1) 100%);
+    box-shadow: 0 0 10px rgba(180,220,255,0.5), 0 0 25px rgba(180,220,255,0.3), 0 0 50px rgba(180,220,255,0.1);
+  }
+  .fridge-led-cone {
+    position: fixed; top: 0; left: 16px; right: 16px; height: 160px; z-index: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(210,235,255,0.55) 0%, rgba(200,228,250,0.3) 25%, rgba(190,220,245,0.12) 50%, transparent 100%);
+  }
+  .fridge-shelves {
+    position: fixed; top: 0; bottom: 0; left: 16px; right: 16px; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(180deg,
+      transparent 0px, transparent 248px,
+      rgba(130,155,178,0.5) 248px, rgba(150,175,198,0.7) 249px,
+      rgba(180,210,235,0.25) 249px, rgba(195,225,248,0.45) 250px,
+      rgba(210,235,255,0.55) 251px, rgba(220,240,255,0.6) 252px,
+      rgba(210,235,255,0.55) 253px, rgba(195,225,248,0.4) 254px,
+      rgba(180,210,235,0.25) 255px,
+      rgba(140,165,188,0.6) 255px, rgba(120,148,172,0.4) 256px,
+      transparent 256px
+    );
+  }
+  .fridge-shelf-glare {
+    position: fixed; top: 0; bottom: 0; left: 16px; right: 16px; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(180deg,
+      transparent 0px, transparent 250px,
+      rgba(255,255,255,0.3) 250px, rgba(255,255,255,0.15) 251px, transparent 252px
+    );
+  }
+  .fridge-shelf-shadow {
+    position: fixed; top: 0; bottom: 0; left: 16px; right: 16px; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(180deg,
+      transparent 0px, transparent 256px,
+      rgba(60,90,120,0.12) 256px, rgba(60,90,120,0.06) 264px,
+      rgba(60,90,120,0.02) 272px, transparent 280px
+    );
+  }
+  .fridge-mount-l, .fridge-mount-r {
+    position: fixed; top: 0; bottom: 0; width: 6px; z-index: 0; pointer-events: none;
+  }
+  .fridge-mount-l {
+    left: 16px;
+    background: repeating-linear-gradient(180deg,
+      transparent 0px, transparent 246px,
+      rgba(120,145,170,0.4) 246px, rgba(140,165,190,0.6) 248px,
+      rgba(140,165,190,0.6) 256px, rgba(120,145,170,0.4) 258px,
+      transparent 258px
+    );
+  }
+  .fridge-mount-r {
+    right: 16px;
+    background: repeating-linear-gradient(180deg,
+      transparent 0px, transparent 246px,
+      rgba(120,145,170,0.4) 246px, rgba(140,165,190,0.6) 248px,
+      rgba(140,165,190,0.6) 256px, rgba(120,145,170,0.4) 258px,
+      transparent 258px
+    );
+  }
+
   /* HEADER */
   .header {
-    background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
-    border-bottom: 1px solid #333;
+    background: linear-gradient(180deg, rgba(34,34,34,0.92) 0%, rgba(26,26,26,0.92) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
     padding: 20px 20px 16px;
     position: sticky;
     top: 0;
@@ -99,8 +199,8 @@
 
   .voice-btn {
     width: 100%;
-    background: linear-gradient(135deg, #2a2a2a 0%, #222 100%);
-    border: 1.5px solid #444;
+    background: linear-gradient(135deg, rgba(42,42,42,0.9) 0%, rgba(34,34,34,0.9) 100%);
+    border: 1.5px solid rgba(255,255,255,0.1);
     border-radius: 18px;
     padding: 20px;
     display: flex;
@@ -221,8 +321,10 @@
   }
 
   .category-block {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
+    background: rgba(20,20,24,0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 16px;
     overflow: hidden;
   }
@@ -510,8 +612,8 @@
 
   .input-btn {
     flex: 1;
-    background: linear-gradient(135deg, #2a2a2a 0%, #222 100%);
-    border: 1.5px solid #444;
+    background: linear-gradient(135deg, rgba(42,42,42,0.9) 0%, rgba(34,34,34,0.9) 100%);
+    border: 1.5px solid rgba(255,255,255,0.1);
     border-radius: 18px;
     padding: 14px 12px;
     display: flex;
@@ -711,8 +813,10 @@
   .recipe-card {
     flex-shrink: 0;
     width: 260px;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
+    background: rgba(20,20,24,0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 16px;
     padding: 18px;
     scroll-snap-align: start;
@@ -760,9 +864,11 @@
     display: flex;
     gap: 0;
     margin: 0 20px 16px;
-    background: #1a1a1a;
+    background: rgba(20,20,24,0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 14px;
-    border: 1px solid #2a2a2a;
+    border: 1px solid rgba(255,255,255,0.06);
     overflow: hidden;
   }
 
@@ -800,6 +906,21 @@
 </style>
 </head>
 <body>
+
+<!-- FRIDGE BACKGROUND -->
+<div class="fridge-inner"></div>
+<div class="fridge-texture"></div>
+<div class="fridge-shelves"></div>
+<div class="fridge-shelf-glare"></div>
+<div class="fridge-shelf-shadow"></div>
+<div class="fridge-mount-l"></div>
+<div class="fridge-mount-r"></div>
+<div class="fridge-led"></div>
+<div class="fridge-led-cone"></div>
+<div class="fridge-round-l"></div>
+<div class="fridge-round-r"></div>
+<div class="fridge-wall-l"></div>
+<div class="fridge-wall-r"></div>
 
 <div class="header">
   <div class="header-top">
