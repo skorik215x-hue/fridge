@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="АйХолодильник">
+<title>АйХолодильник</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: #111;
+    color: #e8e8e8;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
+    border-bottom: 1px solid #333;
+    padding: 20px 20px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #888 0%, #555 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  .logo-text span {
+    color: #aaa;
+    font-weight: 400;
+  }
+
+  .sync-status {
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 0.3px;
+  }
+
+  .sync-status.live {
+    color: #6dbf6d;
+  }
+
+  .sync-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #6dbf6d;
+    border-radius: 50%;
+    margin-right: 4px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* VOICE BUTTON */
+  .voice-section {
+    padding: 24px 20px 16px;
+  }
+
+  .voice-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #2a2a2a 0%, #222 100%);
+    border: 1.5px solid #444;
+    border-radius: 18px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .voice-btn:active {
+    transform: scale(0.98);
+    border-color: #888;
+  }
+
+  .voice-btn.listening {
+    border-color: #aaa;
+    background: linear-gradient(135deg, #2f2f2f 0%, #272727 100%);
+    box-shadow: 0 0 20px rgba(180,180,180,0.1);
+  }
+
+  .voice-mic {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #666 0%, #444 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  }
+
+  .voice-btn.listening .voice-mic {
+    background: linear-gradient(135deg, #999 0%, #666 100%);
+    box-shadow: 0 0 20px rgba(180,180,180,0.3);
+    animation: micPulse 1s infinite;
+  }
+
+  @keyframes micPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  .voice-text {
+    flex: 1;
+  }
+
+  .voice-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin-bottom: 4px;
+  }
+
+  .voice-subtitle {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+  }
+
+  .voice-btn.listening .voice-subtitle {
+    color: #999;
+  }
+
+  /* TRANSCRIPT */
+  .transcript-box {
+    margin: 0 20px 16px;
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: #ccc;
+    min-height: 50px;
+    display: none;
+    line-height: 1.5;
+  }
+
+  .transcript-box.visible {
+    display: block;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 10px;
+    padding: 0 20px 20px;
+  }
+
+  .stat-chip {
+    background: #1e1e1e;
+    border: 1px solid #2e2e2e;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: #777;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stat-chip strong {
+    color: #ccc;
+    font-size: 15px;
+  }
+
+  /* CATEGORIES */
+  .categories {
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 100px;
+  }
+
+  .category-block {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .category-header {
+    padding: 14px 16px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #222;
+  }
+
+  .category-emoji {
+    font-size: 20px;
+  }
+
+  .category-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    flex: 1;
+  }
+
+  .category-count {
+    font-size: 12px;
+    color: #555;
+    background: #222;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .items-list {
+    padding: 8px 0;
+  }
+
+  .item-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    gap: 12px;
+    transition: background 0.15s;
+    animation: itemIn 0.3s ease;
+  }
+
+  @keyframes itemIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .item-row:active {
+    background: #222;
+  }
+
+  .item-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #555;
+    flex-shrink: 0;
+  }
+
+  .item-name {
+    flex: 1;
+    font-size: 16px;
+    color: #ddd;
+    font-weight: 400;
+  }
+
+  .item-time {
+    font-size: 11px;
+    color: #444;
+  }
+
+  .item-delete {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #444;
+    font-size: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .item-delete:active {
+    background: #2a2a2a;
+    color: #888;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: #444;
+  }
+
+  .empty-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #555;
+  }
+
+  .empty-sub {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #333;
+    border: 1px solid #444;
+    color: #e0e0e0;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    padding: 0 20px 12px;
+    font-size: 12px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">❄️</div>
+      <div class="logo-text">Ай<span>Холодильник</span></div>
+    </div>
+    <div class="sync-status live" id="syncStatus">
+      <span class="sync-dot"></span>В сети
+    </div>
+  </div>
+</div>
+
+<div class="voice-section">
+  <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
+    <div class="voice-mic">🎤</div>
+    <div class="voice-text">
+      <div class="voice-title">Скажите что положили</div>
+      <div class="voice-subtitle" id="voiceSubtitle">Нажмите и говорите: "купил молоко, хлеб, котлетки"</div>
+    </div>
+  </button>
+</div>
+
+<div class="transcript-box" id="transcriptBox"></div>
+
+<div class="stats-bar">
+  <div class="stat-chip">
+    <strong id="totalCount">0</strong> продуктов
+  </div>
+  <div class="stat-chip">
+    ❄️ Свежее
+  </div>
+</div>
+
+<div class="section-title">В холодильнике</div>
+
+<div class="categories" id="categoriesContainer">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">🫙</div>
+    <div class="empty-title">Холодильник пуст</div>
+    <div class="empty-sub">Нажмите на микрофон<br>и скажите что положили</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── КАТЕГОРИИ ───────────────────────────────────────────────
+const CATEGORIES = {
+  'Мясо и рыба': {
+    emoji: '🥩',
+    keywords: ['котлет', 'мясо', 'курица', 'куриц', 'рыба', 'рыб', 'говядин', 'свинин', 'фарш', 'сосиск', 'колбас', 'ветчин', 'бекон', 'стейк', 'шашлык', 'креветк']
+  },
+  'Молочное': {
+    emoji: '🥛',
+    keywords: ['молоко', 'молок', 'кефир', 'йогурт', 'творог', 'сметан', 'масло', 'сыр', 'ряженк', 'простоквашу', 'сливки', 'мороженое']
+  },
+  'Напитки': {
+    emoji: '🥤',
+    keywords: ['кола', 'кока', 'пепси', 'сок', 'вода', 'компот', 'лимонад', 'квас', 'пиво', 'вино', 'чай', 'кофе', 'энергетик', 'sprite', 'фанта', 'морс']
+  },
+  'Сладкое': {
+    emoji: '🍬',
+    keywords: ['шоколад', 'конфет', 'торт', 'пирожн', 'печень', 'вафл', 'карамел', 'зефир', 'мармелад', 'халва', 'мёд', 'варень', 'джем']
+  },
+  'Фрукты и овощи': {
+    emoji: '🥦',
+    keywords: ['яблок', 'банан', 'апельсин', 'лимон', 'помидор', 'огурец', 'огурц', 'морков', 'картофел', 'картошк', 'лук', 'чеснок', 'перец', 'капуст', 'виноград', 'клубник', 'черешн', 'груш', 'персик', 'арбуз', 'дыня', 'зелень', 'салат', 'шпинат']
+  },
+  'Хлеб': {
+    emoji: '🍞',
+    keywords: ['хлеб', 'батон', 'булк', 'лаваш', 'багет', 'тост', 'выпечк', 'булочк', 'пирог']
+  },
+  'Яйца': {
+    emoji: '🥚',
+    keywords: ['яйц', 'яйко', 'яйка']
+  },
+  'Готовая еда': {
+    emoji: '🍱',
+    keywords: ['суп', 'борщ', 'каша', 'пельмен', 'вареник', 'блин', 'пицц', 'роллы', 'суши', 'лапш', 'макарон', 'рис', 'гречк', 'остатк']
+  },
+  'Соусы и прочее': {
+    emoji: '🫙',
+    keywords: ['кетчуп', 'майонез', 'горчиц', 'соус', 'уксус', 'масло', 'маринад', 'оливк', 'огурц', 'консерв']
+  }
+};
+
+// ─── ХРАНИЛИЩЕ ────────────────────────────────────────────────
+const STORAGE_KEY = 'fridge_items_v1';
+
+function loadItems() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  } catch(e) { return []; }
+}
+
+function saveItems(items) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+}
+
+let items = loadItems();
+
+// ─── КАТЕГОРИЗАЦИЯ ────────────────────────────────────────────
+function getCategory(name) {
+  const lower = name.toLowerCase();
+  for (const [cat, data] of Object.entries(CATEGORIES)) {
+    for (const kw of data.keywords) {
+      if (lower.includes(kw)) return cat;
+    }
+  }
+  return 'Прочее';
+}
+
+function getCategoryEmoji(cat) {
+  return CATEGORIES[cat]?.emoji || '📦';
+}
+
+// ─── ПАРСИНГ ГОЛОСА ───────────────────────────────────────────
+function parseVoiceInput(text) {
+  // Убираем служебные слова
+  let clean = text.toLowerCase();
+  clean = clean.replace(/\b(купил|купила|положил|положила|добавил|добавила|заказал|заказала|принёс|принесла|есть|имеется|лежит|стоит|поставил|поставила)\b/g, '');
+  clean = clean.replace(/\b(в холодильник|в холодос|домой|туда|сюда)\b/g, '');
+
+  // Разбиваем по разделителям
+  const parts = clean.split(/[,;и\n]+/).map(p => p.trim()).filter(p => p.length > 1);
+
+  const result = [];
+  for (let part of parts) {
+    // Убираем лишние слова и артикли
+    part = part.replace(/^(ещё|еще|также|плюс|ну|вот|там)\s+/g, '').trim();
+    if (part.length > 1) {
+      // Красиво капитализируем
+      result.push(part.charAt(0).toUpperCase() + part.slice(1));
+    }
+  }
+  return result;
+}
+
+// ─── ДОБАВЛЕНИЕ ПРОДУКТОВ ─────────────────────────────────────
+function addItems(names) {
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+  let added = 0;
+  for (const name of names) {
+    if (name.length < 2) continue;
+    // Не дублируем
+    const exists = items.find(i => i.name.toLowerCase() === name.toLowerCase());
+    if (!exists) {
+      items.push({
+        id: Date.now() + Math.random(),
+        name: name,
+        category: getCategory(name),
+        time: timeStr
+      });
+      added++;
+    }
+  }
+
+  if (added > 0) {
+    saveItems(items);
+    renderAll();
+    showToast(added === 1 ? `Добавлено: ${names[0]}` : `Добавлено ${added} продукта(-ов)`);
+  }
+}
+
+function removeItem(id) {
+  const item = items.find(i => i.id === id);
+  items = items.filter(i => i.id !== id);
+  saveItems(items);
+  renderAll();
+  if (item) showToast(`Убрано: ${item.name}`);
+}
+
+// ─── РЕНДЕР ───────────────────────────────────────────────────
+function renderAll() {
+  const container = document.getElementById('categoriesContainer');
+  const empty = document.getElementById('emptyState');
+  const totalCount = document.getElementById('totalCount');
+
+  totalCount.textContent = items.length;
+
+  if (items.length === 0) {
+    container.innerHTML = '';
+    container.appendChild(empty);
+    empty.style.display = 'block';
+    return;
+  }
+
+  // Группируем по категориям
+  const groups = {};
+  for (const item of items) {
+    if (!groups[item.category]) groups[item.category] = [];
+    groups[item.category].push(item);
+  }
+
+  container.innerHTML = '';
+
+  for (const [cat, catItems] of Object.entries(groups)) {
+    const block = document.createElement('div');
+    block.className = 'category-block';
+
+    const emoji = getCategoryEmoji(cat);
+
+    block.innerHTML = `
+      <div class="category-header">
+        <span class="category-emoji">${emoji}</span>
+        <span class="category-name">${cat}</span>
+        <span class="category-count">${catItems.length}</span>
+      </div>
+      <div class="items-list" id="list_${cat.replace(/\s/g,'_')}"></div>
+    `;
+
+    container.appendChild(block);
+
+    const list = block.querySelector('.items-list');
+    for (const item of catItems) {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <div class="item-dot"></div>
+        <div class="item-name">${item.name}</div>
+        <div class="item-time">${item.time}</div>
+        <div class="item-delete" onclick="removeItem(${item.id})">×</div>
+      `;
+      list.appendChild(row);
+    }
+  }
+}
+
+// ─── ГОЛОСОВОЙ ВВОД ───────────────────────────────────────────
+let recognition = null;
+let isListening = false;
+
+function toggleVoice() {
+  if (isListening) {
+    stopVoice();
+  } else {
+    startVoice();
+  }
+}
+
+function startVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showToast('Голосовой ввод не поддерживается в этом браузере');
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'ru-RU';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  const btn = document.getElementById('voiceBtn');
+  const subtitle = document.getElementById('voiceSubtitle');
+  const transcript = document.getElementById('transcriptBox');
+
+  recognition.onstart = () => {
+    isListening = true;
+    btn.classList.add('listening');
+    subtitle.textContent = 'Слушаю... говорите';
+    transcript.className = 'transcript-box visible';
+    transcript.textContent = '...';
+  };
+
+  recognition.onresult = (e) => {
+    let text = '';
+    for (let i = 0; i < e.results.length; i++) {
+      text += e.results[i][0].transcript;
+    }
+    transcript.textContent = text;
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    btn.classList.remove('listening');
+    subtitle.textContent = 'Нажмите и говорите: "купил молоко, хлеб, котлетки"';
+
+    const text = transcript.textContent;
+    if (text && text !== '...') {
+      const parsed = parseVoiceInput(text);
+      if (parsed.length > 0) {
+        addItems(parsed);
+        setTimeout(() => {
+          transcript.className = 'transcript-box';
+          transcript.textContent = '';
+        }, 2000);
+      }
+    }
+  };
+
+  recognition.onerror = (e) => {
+    isListening = false;
+    btn.classList.remove('listening');
+    subtitle.textContent = 'Нажмите и говорите: "купил молоко, хлеб, котлетки"';
+    transcript.className = 'transcript-box';
+    if (e.error !== 'no-speech') showToast('Ошибка микрофона: ' + e.error);
+  };
+
+  recognition.start();
+}
+
+function stopVoice() {
+  if (recognition) recognition.stop();
+}
+
+// ─── TOAST ────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
