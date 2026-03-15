@@ -912,6 +912,23 @@
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 </style>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyA8FCDZiubRs-LK0INZjpJj9B_hZ5rvr-g",
+    authDomain: "holodilnik-d9362.firebaseapp.com",
+    databaseURL: "https://holodilnik-d9362-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "holodilnik-d9362",
+    storageBucket: "holodilnik-d9362.firebasestorage.app",
+    messagingSenderId: "760281114301",
+    appId: "1:760281114301:web:bc8b8377c25d4db38bb9d4",
+    measurementId: "G-FJDX4C924F"
+  });
+  const db = firebase.database();
+  const itemsRef = db.ref('items');
+</script>
 </head>
 <body>
 
@@ -1074,7 +1091,38 @@ function loadItems() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
   catch(e) { return []; }
 }
-function saveItems(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+function saveItems(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  // Синхронизация с Firebase
+  itemsRef.set(arr).catch(e => console.warn('[Firebase] Ошибка записи:', e));
+}
+
+// Firebase real-time listener — обновляет items при изменениях с других устройств
+let firebaseReady = false;
+itemsRef.on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data === null && !firebaseReady) {
+    // Firebase пуст — заливаем локальные данные (миграция)
+    const local = loadItems();
+    if (local.length > 0) {
+      console.log('[Firebase] Миграция: заливаем', local.length, 'продуктов из localStorage');
+      itemsRef.set(local);
+    }
+    firebaseReady = true;
+    return;
+  }
+  firebaseReady = true;
+  const firebaseItems = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+  // Обновляем только если данные отличаются от текущих
+  const currentJSON = JSON.stringify(items);
+  const firebaseJSON = JSON.stringify(firebaseItems);
+  if (currentJSON !== firebaseJSON) {
+    console.log('[Firebase] Синхронизация:', firebaseItems.length, 'продуктов');
+    items = firebaseItems;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    renderAll();
+  }
+});
 
 function getApiKey() {
   const stored = localStorage.getItem(API_KEY_STORAGE);
@@ -1818,11 +1866,19 @@ async function loadRecipes() {
   btn.classList.add('loading');
   btn.textContent = 'Думаю...';
 
-  const productList = items.map(i => `${i.emoji || ''} ${i.name}${i.qty ? ' (' + i.qty + ')' : ''}`).join(', ');
+  const fridgeItems = items.filter(i => !STORAGE_CATEGORIES.has(i.category));
+  const stockItems = items.filter(i => STORAGE_CATEGORIES.has(i.category));
+  const fmt = i => `${i.emoji || ''} ${i.name}${i.qty ? ' (' + i.qty + ')' : ''}`;
+  const fridgeList = fridgeItems.map(fmt).join(', ');
+  const stockList = stockItems.map(fmt).join(', ');
 
-  const prompt = `В холодильнике: ${productList}
+  let productsText = '';
+  if (fridgeList) productsText += `В холодильнике: ${fridgeList}`;
+  if (stockList) productsText += `${fridgeList ? '\n' : ''}На складе (крупы, макароны, консервы, специи): ${stockList}`;
 
-Предложи 3-4 простых блюда, которые можно приготовить из этих продуктов. Это для семьи с подростками — блюда должны быть вкусные, простые, понятные.
+  const prompt = `${productsText}
+
+Предложи 3-4 простых блюда, которые можно приготовить из ВСЕХ доступных продуктов (и из холодильника, и со склада). Это для семьи с подростками — блюда должны быть вкусные, простые, понятные.
 
 Верни ТОЛЬКО валидный JSON-массив (без markdown, без \`\`\`):
 [
@@ -1830,12 +1886,13 @@ async function loadRecipes() {
     "emoji": "один эмодзи блюда",
     "name": "Название блюда",
     "desc": "Короткое описание в 1 предложение — как приготовить",
-    "from": "какие продукты из холодильника используются (через запятую)"
+    "from": "какие продукты используются (через запятую)"
   }
 ]
 
 Правила:
-- Используй ТОЛЬКО то что есть в холодильнике, не выдумывай продуктов
+- Используй ТОЛЬКО то что есть в холодильнике и на складе, не выдумывай продуктов
+- Комбинируй продукты из обоих мест (например макароны со склада + мясо из холодильника)
 - Блюда простые, на 15-30 минут
 - Можно предположить что дома есть соль, перец, масло, вода
 - Названия весёлые и аппетитные`;
