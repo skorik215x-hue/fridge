@@ -1123,10 +1123,27 @@ function processAIProducts(aiProducts) {
 
 function removeItem(id) {
   const item = items.find(i => i.id === id);
-  items = items.filter(i => i.id !== id);
-  saveItems(items);
-  renderAll();
-  if (item) showToast(`Убрано: ${item.name}`);
+  if (!item) return;
+
+  // Парсим количество: "4 шт" → число=4, единица="шт"
+  const qtyMatch = item.qty ? item.qty.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/) : null;
+  const qtyNum = qtyMatch ? parseFloat(qtyMatch[1].replace(',', '.')) : 0;
+  const qtyUnit = qtyMatch ? qtyMatch[2].trim() : '';
+
+  if (qtyNum > 1) {
+    // Уменьшаем на 1
+    const newQty = qtyNum - 1;
+    item.qty = newQty + (qtyUnit ? ' ' + qtyUnit : '');
+    saveItems(items);
+    renderAll();
+    showToast(`${item.name}: ${item.qty}`);
+  } else {
+    // Удаляем полностью
+    items = items.filter(i => i.id !== id);
+    saveItems(items);
+    renderAll();
+    showToast(`Убрано: ${item.name}`);
+  }
 }
 
 // ─── ОБРАБОТКА ГОЛОСОВОГО ТЕКСТА ──────────────────────────────
